@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login – Nails by Shreya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #1a0a12 0%, #2e1020 60%, #1a0a12 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(232,64,122,0.18);
+      border-radius: 24px;
+      padding: 52px 44px;
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .logo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .logo span { color: #e8407a; font-style: italic; }
+    .sub {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.85rem;
+      margin-bottom: 36px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    input[type="password"] {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(232,64,122,0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 24px;
+    }
+    input[type="password"]:focus { border-color: #e8407a; }
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #e8407a, #c0185a);
+      color: #fff;
+      border: none;
+      padding: 15px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: 0.3s;
+      box-shadow: 0 6px 24px rgba(200,24,90,0.35);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(200,24,90,0.45); }
+    .error {
+      background: rgba(232,64,122,0.15);
+      border: 1px solid rgba(232,64,122,0.3);
+      color: #f9b4cc;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Nails <span>by Shreya</span></div>
+    <div class="sub">Admin Panel</div>
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="POST">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter admin password" autofocus required>
+      <button type="submit" class="btn">Login →</button>
+    </form>
+  </div>
+</body>
+</html>

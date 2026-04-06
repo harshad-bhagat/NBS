@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard – Nails by Shreya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --pink: #e8407a; --pink-deep: #c0185a; --pink-light: #f9b4cc;
+      --dark: #1a0a12; --dark-mid: #2e1020;
+      --bg: #fdf0f5; --surface: #fff;
+      --text: #3d1a28; --text-light: #7a5060;
+      --green: #25d366; --orange: #f59e0b; --red: #ef4444;
+      --radius: 16px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed; top:0; left:0; bottom:0; width:240px;
+      background: var(--dark);
+      display: flex; flex-direction: column;
+      z-index: 100; padding: 0 0 24px;
+    }
+    .sidebar-logo {
+      padding: 28px 24px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.3rem; color: #fff;
+    }
+    .sidebar-logo span { color: var(--pink); font-style: italic; }
+    .sidebar-sub { font-size: 0.72rem; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; font-family: 'DM Sans', sans-serif; font-weight: 400; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 24px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 0.9rem; font-weight: 500;
+      transition: 0.2s;
+      position: relative;
+    }
+    .nav-item:hover, .nav-item.active { color: #fff; background: rgba(232,64,122,0.12); }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--pink); border-radius: 0 3px 3px 0;
+    }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--pink);
+      color: #fff;
+      font-size: 0.7rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 50px;
+    }
+    .sidebar-logout {
+      margin-top: auto;
+      padding: 13px 24px;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+    .sidebar-logout:hover { color: var(--pink-light); }
+
+    /* MAIN */
+    .main { margin-left: 240px; padding: 40px; }
+
+    /* STATS ROW */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 36px; }
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: 0 2px 20px rgba(200,40,100,0.07);
+    }
+    .stat-label { font-size: 0.78rem; color: var(--text-light); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .stat-value { font-family: 'Playfair Display', Georgia, serif; font-size: 2.2rem; color: var(--dark); line-height: 1; }
+    .stat-value.pink { color: var(--pink); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.orange { color: var(--orange); }
+
+    /* SECTION */
+    .section { background: var(--surface); border-radius: var(--radius); padding: 32px; margin-bottom: 28px; box-shadow: 0 2px 20px rgba(200,40,100,0.07); }
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 1.3rem; color: var(--dark); }
+    .badge {
+      display: inline-block; padding: 4px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+    }
+    .badge-pending  { background: #fff7ed; color: var(--orange); }
+    .badge-confirmed{ background: #f0fdf4; color: #16a34a; }
+    .badge-cancelled{ background: #fef2f2; color: var(--red); }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; font-size: 0.75rem; color: var(--text-light); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 16px 14px; border-bottom: 1px solid #f0dde5; }
+    td { padding: 14px 16px; border-bottom: 1px solid #fdf0f5; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fdf8fa; }
+
+    /* ACTIONS */
+    .action-form { display: inline; }
+    .btn-sm {
+      padding: 6px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: 0.2s;
+    }
+    .btn-confirm  { background: #f0fdf4; color: #16a34a; }
+    .btn-confirm:hover  { background: #16a34a; color: #fff; }
+    .btn-cancel   { background: #fef2f2; color: var(--red); }
+    .btn-cancel:hover   { background: var(--red); color: #fff; }
+    .btn-delete   { background: #f5f5f5; color: #666; }
+    .btn-delete:hover   { background: #333; color: #fff; }
+    .btn-read     { background: #eff6ff; color: #2563eb; }
+    .btn-read:hover     { background: #2563eb; color: #fff; }
+    .btn-wa       { background: #f0fdf4; color: var(--green); text-decoration: none; display: inline-block; }
+    .btn-wa:hover       { background: var(--green); color: #fff; }
+    .btn-unblock  { background: #fef2f2; color: var(--red); }
+    .btn-unblock:hover  { background: var(--red); color: #fff; }
+
+    /* BLOCK DATE FORM */
+    .block-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 24px; padding: 20px; background: var(--bg); border-radius: 12px; }
+    .block-form label { font-size: 0.78rem; color: var(--text-light); letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .block-form input {
+      background: #fff; border: 1px solid #f0d0dc; border-radius: 10px;
+      padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      color: var(--text); outline: none;
+    }
+    .block-form input:focus { border-color: var(--pink); }
+    .btn-block {
+      background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+      color: #fff; border: none; padding: 10px 22px; border-radius: 50px;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 4px 14px rgba(200,24,90,0.25); transition: 0.2s;
+    }
+    .btn-block:hover { transform: translateY(-2px); }
+
+    /* UNREAD DOT */
+    .unread-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pink); margin-right: 8px; }
+
+    .empty { text-align: center; color: var(--text-light); padding: 32px; font-size: 0.92rem; }
+
+    /* PHONE LINK */
+    .phone-link { color: var(--pink-deep); text-decoration: none; font-weight: 500; }
+    .phone-link:hover { text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 20px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    Nails <span>by Shreya</span>
+    <div class="sidebar-sub">Admin Panel</div>
+  </div>
+  <a href="#bookings" class="nav-item">
+    💅 Bookings
+    {% if pending > 0 %}<span class="nav-badge">{{ pending }}</span>{% endif %}
+  </a>
+  <a href="#messages" class="nav-item">
+    💌 Messages
+    {% if unread > 0 %}<span class="nav-badge">{{ unread }}</span>{% endif %}
+  </a>
+  <a href="#blocked" class="nav-item">📅 Block Dates</a>
+  <a href="/" target="_blank" class="nav-item">🌐 View Website</a>
+  <a href="/admin/logout" class="sidebar-logout">← Logout</a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Bookings</div>
+      <div class="stat-value pink">{{ bookings|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value orange">{{ pending }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Messages</div>
+      <div class="stat-value pink">{{ messages|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unread</div>
+      <div class="stat-value green">{{ unread }}</div>
+    </div>
+  </div>
+
+  <!-- BOOKINGS -->
+  <div id="bookings" class="section">
+    <div class="section-head">
+      <div class="section-title">💅 Appointments</div>
+    </div>
+    {% if bookings %}
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Name</th><th>Phone</th><th>Service</th><th>Date</th><th>Time</th><th>Notes</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+          <tr>
+            <td style="color:var(--text-light);font-size:0.8rem;">#{{ b.id }}</td>
+            <td><strong>{{ b.first_name }} {{ b.last_name }}</strong><br><span style="font-size:0.75rem;color:var(--text-light);">{{ b.created_at.strftime('%d %b %Y') }}</span></td>
+            <td><a class="phone-link" href="tel:{{ b.phone }}">{{ b.phone }}</a></td>
+            <td>{{ b.service }}</td>
+            <td><strong>{{ b.date }}</strong></td>
+            <td>{{ b.time or '—' }}</td>
+            <td style="max-width:160px;font-size:0.82rem;color:var(--text-light);">{{ b.notes or '—' }}</td>
+            <td>
+              <span class="badge badge-{{ b.status }}">{{ b.status.title() }}</span>
+            </td>
+            <td style="white-space:nowrap;">
+              {% if b.status != 'confirmed' %}
+              <form class="action-form" method="POST" action="/admin/booking/{{ b.id }}/status">
+                <input type="hidden" name="status" value="confirmed">
+                <button type="submit" class="btn-sm btn-confirm">✓ Confirm</button>
+              </form>
+              {% endif %}
+              {% if b.status != 'cancelled' %}
+              <form class="action-form" method="POST" action="/admin/booking/{{ b.id }}/status">
+                <input type="hidden" name="status" value="cancelled">
+                <button type="submit" class="btn-sm btn-cancel">✗ Cancel</button>
+              </form>
+              {% endif %}
+              <a class="btn-sm btn-wa" href="https://wa.me/91{{ b.phone }}?text={{ ('Hi ' + b.first_name + ', your appointment for ' + b.service + ' on ' + b.date + ' is confirmed! — Nails by Shreya 💅')|urlencode }}" target="_blank">💬 WA</a>
+              <form class="action-form" method="POST" action="/admin/booking/{{ b.id }}/delete" onsubmit="return confirm('Delete this booking?')">
+                <button type="submit" class="btn-sm btn-delete">🗑</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <div class="empty">No bookings yet. They'll show up here when clients book. ✨</div>
+    {% endif %}
+  </div>
+
+  <!-- MESSAGES -->
+  <div id="messages" class="section">
+    <div class="section-head">
+      <div class="section-title">💌 Messages</div>
+    </div>
+    {% if messages %}
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Phone</th><th>Message</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for m in messages %}
+          <tr>
+            <td style="color:var(--text-light);font-size:0.8rem;">#{{ m.id }}</td>
+            <td>
+              {% if not m.is_read %}<span class="unread-dot"></span>{% endif %}
+              <strong>{{ m.name }}</strong>
+            </td>
+            <td><a class="phone-link" href="tel:{{ m.phone }}">{{ m.phone }}</a></td>
+            <td style="max-width:300px;font-size:0.88rem;">{{ m.message }}</td>
+            <td style="font-size:0.8rem;color:var(--text-light);">{{ m.created_at.strftime('%d %b %Y %H:%M') }}</td>
+            <td style="white-space:nowrap;">
+              {% if not m.is_read %}
+              <form class="action-form" method="POST" action="/admin/message/{{ m.id }}/read">
+                <button type="submit" class="btn-sm btn-read">✓ Read</button>
+              </form>
+              {% endif %}
+              <a class="btn-sm btn-wa" href="https://wa.me/91{{ m.phone }}?text={{ ('Hi ' + m.name + ', thanks for reaching out to Nails by Shreya! 💅')|urlencode }}" target="_blank">💬 Reply</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <div class="empty">No messages yet. 💌</div>
+    {% endif %}
+  </div>
+
+  <!-- BLOCK DATES -->
+  <div id="blocked" class="section">
+    <div class="section-head">
+      <div class="section-title">📅 Block Dates</div>
+    </div>
+    <form class="block-form" method="POST" action="/admin/block-date">
+      <div>
+        <label>Date to Block</label>
+        <input type="date" name="date" required>
+      </div>
+      <div>
+        <label>Reason (optional)</label>
+        <input type="text" name="note" placeholder="e.g. Holiday, Personal" style="width:200px;">
+      </div>
+      <button type="submit" class="btn-block">+ Block Date</button>
+    </form>
+
+    {% if blocked %}
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Reason</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for bd in blocked %}
+        <tr>
+          <td><strong>{{ bd.date }}</strong></td>
+          <td style="color:var(--text-light);">{{ bd.note or '—' }}</td>
+          <td>
+            <form class="action-form" method="POST" action="/admin/unblock-date/{{ bd.id }}">
+              <button type="submit" class="btn-sm btn-unblock">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty">No dates blocked. Shreya is available every day! 🌸</div>
+    {% endif %}
+  </div>
+
+</main>
+</body>
+</html>
